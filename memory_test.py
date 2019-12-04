@@ -4,8 +4,6 @@ import json
 import os
 import subprocess
 
-flutter = '/usr/local/google/home/ariaye/flutter'
-
 def wait_for_message(server, test):
     while True:
         stdout_line = server.stdout.readline()
@@ -25,15 +23,17 @@ def make_request(server, id, method, options):
     return make_request_with_test(server, id, method, options, lambda msg: msg.get('id') == str(id))
 
 def main():
+    flutter = os.path.dirname(
+        subprocess.run(['which', 'flutter'], capture_output=True).stdout.decode('utf-8').strip())
     # Start an analysis server with ML completion and observatory enabled.
     server = subprocess.Popen(
         [
-            '%s/bin/cache/dart-sdk/bin/dart' % flutter,
+            '%s/cache/dart-sdk/bin/dart' % flutter,
             '--disable-service-auth-codes',
             '--max_profile_depth=256',
             '--observe=8888',
             '--pause_isolates_on_unhandled_exceptions=false',
-            '%s/bin/cache/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' % flutter,
+            '%s/cache/dart-sdk/bin/snapshots/analysis_server.dart.snapshot' % flutter,
             '--enable-completion-model',
         ],
         stdin=subprocess.PIPE,
